@@ -16,5 +16,7 @@ https://environment.data.gov.uk/flood-monitoring/doc/reference#5dfx
 Example for Buildwas
 https://check-for-flooding.service.gov.uk/station/2058
 
+![image](https://github.com/AgentK88/FloodMonitor/assets/8092108/0fd09931-74ba-49fa-9f05-2e038ec900ec)
+
 What does river level mean?
 https://check-for-flooding.service.gov.uk/how-we-measure-river-sea-groundwater-levels
