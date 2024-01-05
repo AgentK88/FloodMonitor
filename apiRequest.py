@@ -7,8 +7,10 @@ url = 'https://environment.data.gov.uk/flood-monitoring/id/stations/2134' # Buil
 #try:
 
 def request(value):
-
-    # Convert json into dictionary
+    
+    print("GETing API data")
+    
+    # GET API and convert json into dictionary
     resp_dict = urequests.get(url).json()
 
     # Parse each level of json into it's own dictionary

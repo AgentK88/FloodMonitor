@@ -1,4 +1,5 @@
 import network   # handles connecting to WiFi
+from time import sleep
 
 # Fill in your network name (ssid) and password here:
 ssid = 'TP-Link_7B64'
