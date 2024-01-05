@@ -20,6 +20,8 @@ while True:
     
     # Get API values
     latestReading = str(apiRequest.request("latestReading"))
+    latestReading = latestReading.replace("T", " ") # Remove chars as can't convert ISO datetime to string
+    latestReading = latestReading.replace("Z", " ")
     currentLevel = "Current Level: " + str(apiRequest.request("currentLevel"))
     state = "State: " + apiRequest.request("state")
 
@@ -41,6 +43,7 @@ while True:
     epd.EPD_3IN7_4Gray_Display(epd.buffer_4Gray)
 
     # Wait a minute
+    #machine.deepsleep(900) # Deep sleep
     time.sleep(600) # API updates every 15 minutes 60*15 = 900
     print("refreshing now")
 
