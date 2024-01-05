@@ -1,4 +1,4 @@
-import network   # handles connecting to WiFi
+import network # handles connecting to WiFi
 from time import sleep
 
 # Fill in your network name (ssid) and password here:
