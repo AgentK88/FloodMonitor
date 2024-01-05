@@ -1,7 +1,8 @@
 from Pico_ePaper_37 import EPD_3in7 # ePaper driver
 import webConnect # handles connecting to WiFi
 import apiRequest # Calls Flood Level API
-import time # Acquire current time
+import time
+import ntptime # Acquire current time
 
 # Initialize the e-paper display
 epd = EPD_3in7()
@@ -13,6 +14,9 @@ try:
     webConnect.connect()
 except KeyboardInterrupt:
     machine.reset()
+
+# Set time
+ntptime.settime()
 
 while True:
     #Clear display
