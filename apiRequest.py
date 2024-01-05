@@ -4,11 +4,10 @@ import json
 url = 'https://environment.data.gov.uk/flood-monitoring/id/stations/2134' # Buildwas station
 
 # Consider checking API response code is 200
-try:
-    # Convert json into dictionary
-    resp_dict = urequests.get(url).json()
-except requests.exceptions.RequestException as e: # This is the correct syntax
-    raise SystemExit(e)
+#try:
+
+# Convert json into dictionary
+resp_dict = urequests.get(url).json()
 
 # Parse each level of json into it's own dictionary
 items_dict = resp_dict.get("items")
@@ -49,3 +48,7 @@ def request(value):
 #print(json.dumps(data_dict))
 
 #resp.close() # Is this needed?
+'''
+except:
+    print("get error data")
+'''
