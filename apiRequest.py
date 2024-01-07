@@ -6,7 +6,7 @@ url = 'https://environment.data.gov.uk/flood-monitoring/id/stations/2134' # Buil
 # Consider checking API response code is 200
 #try:
 
-def request(value):
+def request():
     
     print("GETing API data")
     
@@ -35,17 +35,9 @@ def request(value):
             return "Low"
         else :
             return "Normal"    
-
-    if value == "currentLevel" :
-        return currentLevel
-    elif value == "latestReading" :
-        return latestReading
-    elif value == "typicalRangeHigh" :
-        return typicalRangeHigh
-    elif value == "typicalRangeLow" :
-        return typicalRangeLow
-    elif value == "state" :
-        return state(currentLevel)
+    
+    # Return all values as a list
+    return [currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state(currentLevel)]
 
     # Pretty Printing JSON string back
     #print(json.dumps(data_dict))
