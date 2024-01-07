@@ -15,7 +15,7 @@ try:
 except KeyboardInterrupt:
     machine.reset()
 
-# Set time
+# Set time - This sometimes returns errors
 ntptime.settime()
 
 while True:
@@ -23,24 +23,29 @@ while True:
     epd.image4Gray.fill(0xff)
     
     # Get API values
-    latestReading = str(apiRequest.request("latestReading"))
+    apiResults = apiRequest.request() # A list of values from API
+    print("API values returned")
+    currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state = apiResults # Unpack list in this order
+    
+    # Tidy up returned values as strings for display
+    latestReading = str(latestReading) # Clean up date as a string
     latestReading = latestReading.replace("T", " ") # Remove chars as can't convert ISO datetime to string
-    latestReading = latestReading.replace("Z", " ")
-    currentLevel = "Current Level: " + str(apiRequest.request("currentLevel"))
-    state = "State: " + apiRequest.request("state")
+    latestReading = latestReading.replace("Z", " ") # Remove chars as can't convert ISO datetime to string
+    currentLevel = "Current Level: " + str(currentLevel)
+    state = "State: "+ state
 
-    # Show the river level values
+    # Display the river level values
     epd.image4Gray.text(latestReading, 60, 10, epd.black)
     epd.image4Gray.text(currentLevel, 60, 40, epd.black)
     epd.image4Gray.text(state, 100, 70, epd.black)
     
-    # Show the current time
+    # Display the current time
     t = time.localtime()
     epd.image4Gray.text("{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
             t[0], t[1], t[2], t[3], t[4], t[5]
             ), 60, 110, epd.darkgray)
 
-    # Show vanity
+    # Display vanity
     epd.image4Gray.text("Written by Kevin Roberts", 50, 150, epd.grayish)
     
     # Buffer? This is required
