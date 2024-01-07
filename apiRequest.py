@@ -1,4 +1,5 @@
 import urequests # handles making and servicing network requests
+import json
 
 url = 'https://environment.data.gov.uk/flood-monitoring/id/stations/2134' # Buildwas station
 
@@ -12,7 +13,7 @@ def request():
     # GET API and convert json into dictionary
     resp_dict = urequests.get(url).json()
 
-    # Parse each element of json into it's own dictionary
+    # Parse each level of json into it's own dictionary
     items_dict = resp_dict.get("items")
     measures_list = items_dict.get("measures") # measures is a list
     #paramFlow_dict = measures_list[0] # "parameter": "flow" is first in measures array
@@ -33,9 +34,8 @@ def request():
         elif currentLevel <= typicalRangeLow :
             return "Low"
         else :
-            return "Normal"
+            return "Normal"    
     
-    print("API values returned")
     # Return all values as a list
     return [currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state(currentLevel)]
 
