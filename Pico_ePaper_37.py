@@ -1,15 +1,15 @@
 # *****************************************************************************
-# * | File        :	  Pico_ePaper-3.7.py
+# * | File        :   Pico_ePaper-3.7.py
 # * | Author      :   Waveshare team
 # * | Function    :   Electronic paper driver
-# * | Info        :
+# * | Info        :   Amended by KR 2024
 # *----------------
 # * | This version:   V1.0
 # * | Date        :   2021-06-01
 # # | Info        :   python demo
 # -----------------------------------------------------------------------------
 # Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documnetation files (the "Software"), to deal
+# of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to  whom the Software is
@@ -25,11 +25,10 @@
 # LIABILITY WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-#
 
 from machine import Pin, SPI
 import framebuf
-import utime
+import time
 
 # Display resolution
 EPD_WIDTH       = 280
@@ -128,16 +127,13 @@ class EPD_3in7:
         
         self.EPD_3IN7_4Gray_init()
         self.EPD_3IN7_4Gray_Clear()
-        utime.sleep_ms(500)
+        time.sleep_ms(500)
 
     def digital_write(self, pin, value):
         pin.value(value)
 
     def digital_read(self, pin):
         return pin.value()
-
-    def delay_ms(self, delaytime):
-        utime.sleep(delaytime / 1000.0)
 
     def spi_writebyte(self, data):
         self.spi.write(bytearray(data))
@@ -148,11 +144,11 @@ class EPD_3in7:
     # Hardware reset
     def reset(self):
         self.digital_write(self.reset_pin, 1)
-        self.delay_ms(30) 
+        time.sleep_ms(30) 
         self.digital_write(self.reset_pin, 0)
-        self.delay_ms(3)
+        time.sleep_ms(3)
         self.digital_write(self.reset_pin, 1)
-        self.delay_ms(30)   
+        time.sleep_ms(30)   
 
     def send_command(self, command):
         self.digital_write(self.dc_pin, 0)
@@ -167,11 +163,9 @@ class EPD_3in7:
         self.digital_write(self.cs_pin, 1)
         
     def ReadBusy(self):
-        print("e-Paper busy")
         while(self.digital_read(self.busy_pin) == 1):      #  0: idle, 1: busy
-            self.delay_ms(10)
-        self.delay_ms(200) 
-        print("e-Paper busy release")
+            time.sleep_ms(10)
+        time.sleep_ms(200)
         
     def Load_LUT(self,lut):
         self.send_command(0x32)
@@ -192,7 +186,7 @@ class EPD_3in7:
         self.reset()              # SWRESET
 
         self.send_command(0x12)
-        self.delay_ms(300)   
+        time.sleep_ms(300)   
 
         self.send_command(0x46)
         self.send_data(0xF7)
@@ -201,7 +195,7 @@ class EPD_3in7:
         self.send_data(0xF7)
         self.ReadBusy()
         
-        self.send_command(0x01)   # setting gaet number
+        self.send_command(0x01)   # setting gate number
         self.send_data(0xDF)
         self.send_data(0x01)
         self.send_data(0x00)
@@ -264,7 +258,7 @@ class EPD_3in7:
         self.reset()
         
         self.send_command(0x12)
-        self.delay_ms(300)  
+        time.sleep_ms(300)  
         
         self.send_command(0x46)
         self.send_data(0xF7)
@@ -273,7 +267,7 @@ class EPD_3in7:
         self.send_data(0xF7)
         self.ReadBusy()
 
-        self.send_command(0x01)   # setting gaet number
+        self.send_command(0x01)   # setting gate number
         self.send_data(0xDF)
         self.send_data(0x01)
         self.send_data(0x00)
@@ -570,7 +564,7 @@ class EPD_3in7:
     def Sleep(self):
         self.send_command(0X10)  # deep sleep
         self.send_data(0x03)
-'''   
+''' 
 if __name__=='__main__':
     
     epd = EPD_3in7()
@@ -612,11 +606,6 @@ if __name__=='__main__':
         epd.image1Gray.fill_rect(0, 430, 280, 10, epd.white)
         epd.image1Gray.text(str(i), 136, 431, epd.black)
         epd.EPD_3IN7_1Gray_Display_Part(epd.buffer_1Gray)
-    
-
-
 
     epd.Sleep()
-
-
 '''

@@ -6,8 +6,8 @@ import time
 import ntptime # Acquire current time
 
 # For development purposes
-import gc
-import os
+import gc # For garbage collection!
+#import os # For checking storage
 
 # Initialize the e-paper display
 epd = EPD_3in7()
@@ -20,17 +20,24 @@ try:
 except KeyboardInterrupt:
     machine.reset()
 
-# Set time - This sometimes returns errors
-#ntptime.settime()
+# Set time - Only if needed. Time defaults to 2021-01-01
+# A client MUST NOT under any conditions use a poll interval less than 15 seconds.
+tc = time.localtime()
+if tc[0] == 2021: # Check if the year is 2021
+    try:
+        ntptime.settime()
+        print("Time set")
+    except OSError as error:
+        print(error)
 
 while True:
     # Check memory used and run garbage collection
-    s = os.statvfs('/')
-    print(f"Free storage: {s[0]*s[3]/1024} KB")
+    #s = os.statvfs('/')
+    #print(f"Free storage: {s[0]*s[3]/1024} KB")
     print(f"Memory: {gc.mem_alloc()} of {gc.mem_free()} bytes used.")
     gc.collect() # garbage collection
     
-    #Clear display
+    # Clear display - otherwise new text will displayed on top
     epd.image4Gray.fill(0xff)
     
     # Get API values
@@ -62,9 +69,11 @@ while True:
     
     # Buffer? This is required
     epd.EPD_3IN7_4Gray_Display(epd.buffer_4Gray)
+    # Partial Update?
+    #epd.EPD_3IN7_1Gray_Display_Part(epd.buffer_1Gray)
 
     # Wait a minute
-    #machine.deepsleep(900) # Deep sleep
+    #epd.Sleep() # Put ePaper to sleep 
     time.sleep(60) # API updates every 15 minutes 60*15 = 900
     print("refreshing now")
     
