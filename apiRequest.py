@@ -12,19 +12,23 @@ def request():
     
     # GET API and convert json into dictionary
     try:
-        r = urequests.get(url)
-        resp_dict = r.json()
-        sc = r.status_code
+        resp = urequests.get(url)
+        status_code = resp.status_code
+        if status_code != 200:
+            print("Error: Status code", status_code)
+            return
+        resp_dict = resp.json()
+    except Exception as e:
+        print(f"Error accessing API: {e}")
+        return
     finally:
-        r.close() # Essential for memory reclamation
-        del r
-
-    print("Status code: {}".format(sc))
-    #resp_dict = urequests.get(url).json()
-
+        resp.close() # Essential for memory reclamation
+        del resp, status_code
+        gc.collect()  # Ensure proper garbage collection
+    
     # Parse each element of json into it's own dictionary
     items_dict = resp_dict.get("items")
-    del resp_dict, sc
+    del resp_dict
     
     measures_list = items_dict.get("measures") # measures is a list
     
@@ -41,7 +45,11 @@ def request():
     latestReading = latestReading_dict.get("dateTime")
     typicalRangeHigh = stageScale_dict.get("typicalRangeHigh")
     typicalRangeLow = stageScale_dict.get("typicalRangeLow")
-
+    # Tidy up returned values as strings for display
+    latestReading = str(latestReading) # Clean up date as a string
+    latestReading = latestReading.replace("T", " ") # Remove chars as can't convert ISO datetime to string
+    latestReading = latestReading.replace("Z", " ") # Remove chars as can't convert ISO datetime to string
+    
     gc.collect()
     
     # Find State (High, Normal, Low)
@@ -57,9 +65,4 @@ def request():
     # Return all values as a list
     return [currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state(currentLevel)]
 
-    # Pretty Printing JSON string back
-    #print(json.dumps(data_dict))
-'''
-except:
-    print("get error data")
-'''
+#print(request())

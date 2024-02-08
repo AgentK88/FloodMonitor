@@ -1,5 +1,5 @@
 from Pico_ePaper import EinkPIO # This is preferrable to using Eink
-import framebuf
+from framebuf import FrameBuffer, MONO_HLSB
 from writer import Writer
 import freesans20
 
@@ -20,16 +20,15 @@ epd.fill() # Clear screen on first run
 epd.show()
 #epd.partial_mode_on() # Enabling partial mode blocks the use of gray
 
-class DummyDevice(framebuf.FrameBuffer):
+class DummyDevice(FrameBuffer):
     def __init__(self, width, height, buf_format):
         self.width = width
         self.height = height
-        self._buf = bytearray(self.width * self.height // 8)
-        super().__init__(self._buf, self.width, self.height, buf_format)
+        super().__init__(bytearray(self.width * self.height // 8), self.width, self.height, MONO_HLSB)
         self.fill(1)
 
 # Create DummyDevice object with the same dimensions as the display.
-dummy = DummyDevice(epd.width, epd.height, framebuf.MONO_HLSB)
+dummy = DummyDevice(epd.width, epd.height, MONO_HLSB)
 # Create Writer instance using dummy as device and freesans20 font.
 wri = Writer(dummy, freesans20)
 # Setup Writer (refer to documentation for details).
@@ -62,10 +61,7 @@ while True:
     apiResults = apiRequest.request() # A list of values from API
     currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state = apiResults # Unpack list in this order
     
-    # Tidy up returned values as strings for display
-    latestReading = str(latestReading) # Clean up date as a string
-    latestReading = latestReading.replace("T", " ") # Remove chars as can't convert ISO datetime to string
-    latestReading = latestReading.replace("Z", " ") # Remove chars as can't convert ISO datetime to string
+    # Add text to returned values for display
     currentLevel = "Current Level: {}".format(str(currentLevel))
     state = "State: {}".format(state)
     trend = "Trend: {}".format(apiRequestTrend.requestTrend())
