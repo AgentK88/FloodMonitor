@@ -18,9 +18,8 @@ import gc # For garbage collection!
 epd = EinkPIO(rotation=90, use_partial_buffer=True)
 epd.fill() # Clear screen on first run
 epd.show()
-epd.partial_mode_on() # Enabling partial mode blocks the use of gray
+#epd.partial_mode_on() # Enabling partial mode blocks the use of gray
 
-'''
 class DummyDevice(framebuf.FrameBuffer):
     def __init__(self, width, height, buf_format):
         self.width = width
@@ -35,7 +34,7 @@ dummy = DummyDevice(epd.width, epd.height, framebuf.MONO_HLSB)
 wri = Writer(dummy, freesans20)
 # Setup Writer (refer to documentation for details).
 wri.set_clip(row_clip=True, col_clip=True, wrap=True)
-'''
+
 # Connect to internet
 try:
     webConnect.connect()
@@ -56,9 +55,9 @@ while True:
     # Check memory used and run garbage collection
     #s = os.statvfs('/')
     #print(f"Free storage: {s[0]*s[3]/1024} KB")
-    print(f"Memory: {gc.mem_alloc()} of {gc.mem_free()} bytes used.")
+    print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
     gc.collect() # garbage collection
-    '''
+    
     # Get API values
     apiResults = apiRequest.request() # A list of values from API
     currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state = apiResults # Unpack list in this order
@@ -67,34 +66,47 @@ while True:
     latestReading = str(latestReading) # Clean up date as a string
     latestReading = latestReading.replace("T", " ") # Remove chars as can't convert ISO datetime to string
     latestReading = latestReading.replace("Z", " ") # Remove chars as can't convert ISO datetime to string
-    currentLevel = "Current Level: " + str(currentLevel)
-    state = "State: " + state
-    trend = "Trend: " + apiRequestTrend.requestTrend()
+    currentLevel = "Current Level: {}".format(str(currentLevel))
+    state = "State: {}".format(state)
+    trend = "Trend: {}".format(apiRequestTrend.requestTrend())
 
     # Display the river level values
-    epd.text(latestReading, 60, 10, epd.black)
-    epd.text(currentLevel, 60, 40, epd.black)
-    epd.text(state, 100, 70, epd.black)
-    epd.text(trend, 80, 100, epd.black)
-    '''
+    #epd.text(latestReading, 60, 10, epd.black)
+    wri.set_textpos(dummy, 10, 60)
+    wri.printstring(latestReading, invert=True)
+    
+    #epd.text(currentLevel, 60, 40, epd.black)
+    #epd.text(state, 100, 70, epd.black)
+    #epd.text(trend, 80, 100, epd.black)
+    wri.set_textpos(dummy, 40, 60)
+    wri.printstring(currentLevel, invert=True)
+    wri.set_textpos(dummy, 70, 100)
+    wri.printstring(state, invert=True)
+    wri.set_textpos(dummy, 100, 80)
+    wri.printstring(trend, invert=True)
+    
     # Display the current time
     t = time.localtime()
-    epd.text("{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
+    wri.set_textpos(dummy, 140, 60)
+    wri.printstring("{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
             t[0], t[1], t[2], t[3], t[4], t[5]
-            ), 60, 140, c=epd.black)
+            ), invert=True)
 
     # Display vanity
+    #wri.set_textpos(dummy, 180, 50)
+    #wri.printstring("Written by Kevin Roberts", invert=True)
     epd.text("Written by Kevin Roberts", 50, 180, c=epd.lightgray)
-
+    
+    epd.blit(dummy, 0, 0, key=1, ram=epd.RAM_RED) # grayscale can be used
     epd.show()
 
     # Clear display - otherwise new text will displayed on top
     epd.fill() # Clear display
-    epd.rect(60, 140, 160, 10, epd.white, f=True) # x, y, wide, high
+    #epd.rect(60, 140, 160, 10, epd.white, f=True) # x, y, wide, high
     
     # Wait a minute
-    #epd.sleep() # Put ePaper to sleep
-    time.sleep(10) # API updates every 15 minutes 60*15 = 900
+    epd.sleep() # Put ePaper to sleep
+    time.sleep(60) # API updates every 15 minutes 60*15 = 900
     print("refreshing now")
-    #epd.reinit()
+    epd.reinit()
     
