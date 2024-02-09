@@ -10,7 +10,8 @@ startDate.day -= 1 # Yesterday
 endDate = "{}-{:02d}-{:02d}".format(endDate.year, endDate.month, endDate.mday)
 startDate = "{}-{:02d}-{:02d}".format(startDate.year, startDate.month, startDate.mday)
 
-url = 'https://environment.data.gov.uk/flood-monitoring/id/stations/2134/readings?parameter=level&startdate='+startDate+'&enddate='+endDate+'&_sorted&_limit='+r # Buildwas station last 24 hours
+# Buildwas station last 24 hours
+url = "https://environment.data.gov.uk/flood-monitoring/id/stations/2134/readings?parameter=level&startdate={}&enddate={}&_sorted&_limit={}".format(startDate,endDate,r)
 
 def requestTrend():
     
@@ -20,30 +21,31 @@ def requestTrend():
     try:
         resp = urequests.get(url)
         status_code = resp.status_code
+        print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
         if status_code != 200:
             print("Error: Status code", status_code)
             return
-        resp_dict = resp.json()
     except Exception as e:
         print(f"Error accessing API: {e}")
         return
     finally:
+        resp_json = resp.json()
         resp.close() # Essential for memory reclamation
         del resp, status_code
         gc.collect()  # Ensure proper garbage collection
 
-    # Items list - Need to check whether this is not empty!
-    items_list = resp_dict.get("items")
-    del resp_dict
-    #print(startDate, endDate, items_list)
+    # Above can be done without creating both resp and resp_json and may save ram
+    # However, response code can't be checked!
+    #resp_json = urequests.get(url).json()
     
-    # For each loop over items_list to gather all values into list
-    #value_list = []
-    value_list = array.array('d',[]) # Array is more memory efficient and only holds float 'd'
-    for i in items_list:
-        value_list.append(i.get("value"))
+    # Check if 'items' key exists in the response
+    if 'items' in resp_json:
+        value_list = array.array('d',[]) # Array is more memory efficient and only holds decimal 'd'
+        # Iterate over the items and extract value key pairs
+        for item in resp_json['items']:
+            value_list.append(item.get("value"))
     
-    del items_list
+    del resp_json
     
     average = sum(value_list) / len(value_list)
     latest = value_list[0] # First value in the list as it is sorted

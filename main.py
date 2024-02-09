@@ -14,6 +14,15 @@ import ntptime # Acquire current time
 import gc # For garbage collection!
 #import os # For checking storage
 
+# Constants for text positions
+TEXT_POSITIONS = [
+    (10, 60),  # latestReading
+    (40, 60),  # currentLevel
+    (70, 100),  # state
+    (100, 80),   # trend
+    (140, 60)   # time
+]
+
 # Initialize the e-paper display
 epd = EinkPIO(rotation=90, use_partial_buffer=True)
 epd.fill() # Clear screen on first run
@@ -61,48 +70,34 @@ while True:
     apiResults = apiRequest.request() # A list of values from API
     currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state = apiResults # Unpack list in this order
     
-    # Add text to returned values for display
-    currentLevel = "Current Level: {}".format(str(currentLevel))
-    state = "State: {}".format(state)
-    trend = "Trend: {}".format(apiRequestTrend.requestTrend())
-
-    # Display the river level values
-    #epd.text(latestReading, 60, 10, epd.black)
-    wri.set_textpos(dummy, 10, 60)
-    wri.printstring(latestReading, invert=True)
-    
-    #epd.text(currentLevel, 60, 40, epd.black)
-    #epd.text(state, 100, 70, epd.black)
-    #epd.text(trend, 80, 100, epd.black)
-    wri.set_textpos(dummy, 40, 60)
-    wri.printstring(currentLevel, invert=True)
-    wri.set_textpos(dummy, 70, 100)
-    wri.printstring(state, invert=True)
-    wri.set_textpos(dummy, 100, 80)
-    wri.printstring(trend, invert=True)
-    
-    # Display the current time
     t = time.localtime()
-    wri.set_textpos(dummy, 140, 60)
-    wri.printstring("{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
+    
+    # Add text to returned values for display
+    texts = [
+        latestReading,
+        "Current Level: {}".format(str(currentLevel)),
+        "State: {}".format(state),
+        "Trend: {}".format(apiRequestTrend.requestTrend()),
+        "{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
             t[0], t[1], t[2], t[3], t[4], t[5]
-            ), invert=True)
+            )
+        ]
 
+    for text, (x, y) in zip(texts, TEXT_POSITIONS):
+            wri.set_textpos(dummy, x, y)
+            wri.printstring(text, invert=True)
+    
     # Display vanity
-    #wri.set_textpos(dummy, 180, 50)
-    #wri.printstring("Written by Kevin Roberts", invert=True)
     epd.text("Written by Kevin Roberts", 50, 180, c=epd.lightgray)
     
     epd.blit(dummy, 0, 0, key=1, ram=epd.RAM_RED) # grayscale can be used
     epd.show()
 
-    # Clear display - otherwise new text will displayed on top
-    epd.fill() # Clear display
-    #epd.rect(60, 140, 160, 10, epd.white, f=True) # x, y, wide, high
-    
     # Wait a minute
     epd.sleep() # Put ePaper to sleep
     time.sleep(60) # API updates every 15 minutes 60*15 = 900
     print("refreshing now")
-    epd.reinit()
     
+    # Reinitialise and clear display - otherwise new text will displayed on top
+    epd.reinit()
+    epd.fill() # Clear display    
