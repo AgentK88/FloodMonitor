@@ -4,17 +4,18 @@ import array
 import gc
 
 r = "96" # Reading every 15 mins (4*24=96) or last 24 hours
-endDate = Date() # Today
-startDate = Date()
-startDate.day -= 1 # Yesterday
-endDate = "{}-{:02d}-{:02d}".format(endDate.year, endDate.month, endDate.mday)
-startDate = "{}-{:02d}-{:02d}".format(startDate.year, startDate.month, startDate.mday)
 
-# Buildwas station last 24 hours
-url = "https://environment.data.gov.uk/flood-monitoring/id/stations/2134/readings?parameter=level&startdate={}&enddate={}&_sorted&_limit={}".format(startDate,endDate,r)
+def requestTrend(date):
 
-def requestTrend():
-    
+    endDate = Date(date) # Today
+    startDate = Date()
+    startDate.day -= 1 # Yesterday
+    endDate = "{}-{:02d}-{:02d}".format(endDate.year, endDate.month, endDate.mday)
+    startDate = "{}-{:02d}-{:02d}".format(startDate.year, startDate.month, startDate.mday)
+
+    # Buildwas station last 24 hours
+    url = "https://environment.data.gov.uk/flood-monitoring/id/stations/2134/readings?parameter=level&startdate={}&enddate={}&_sorted&_limit={}".format(startDate,endDate,r)
+
     print("GETing API trend data")
     
     # GET API and convert json into dictionary

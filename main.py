@@ -12,7 +12,6 @@ import ntptime # Acquire current time
 
 # For development purposes
 import gc # For garbage collection!
-#import os # For checking storage
 
 # Constants for text positions
 TEXT_POSITIONS = [
@@ -26,7 +25,6 @@ TEXT_POSITIONS = [
 # Initialize the e-paper display
 epd = EinkPIO(rotation=90, use_partial_buffer=True)
 epd.fill() # Clear screen on first run
-epd.show()
 #epd.partial_mode_on() # Enabling partial mode blocks the use of gray
 
 class DummyDevice(FrameBuffer):
@@ -45,39 +43,45 @@ wri.set_clip(row_clip=True, col_clip=True, wrap=True)
 
 # Connect to internet
 try:
-    webConnect.connect()
+    ip = webConnect.connect()
+    ip = "IP Address: {}".format(ip[0])
 except KeyboardInterrupt:
     machine.reset()
 
 # Set time - Only if needed. Time defaults to 2021-01-01
-# A client MUST NOT under any conditions use a poll interval less than 15 seconds.
 tc = time.localtime()
 if tc[0] == 2021: # Check if the year is 2021
     try:
         ntptime.settime()
-        print("Time set")
     except OSError as error:
-        print(error)
+        tc = [error,1,2,3,4,5]
+    finally:
+        tc = time.localtime()
+
+tc = "{}, {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(ip,
+            tc[0], tc[1], tc[2], tc[3], tc[4], tc[5]
+            )
+epd.text(tc, 25, 270, c=epd.lightgray)
+epd.show()
 
 while True:
     # Check memory used and run garbage collection
-    #s = os.statvfs('/')
-    #print(f"Free storage: {s[0]*s[3]/1024} KB")
-    print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
     gc.collect() # garbage collection
-    
-    # Get API values
-    apiResults = apiRequest.request() # A list of values from API
-    currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state = apiResults # Unpack list in this order
+    print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
     
     t = time.localtime()
+    
+    # Get API values
+    trend = apiRequestTrend.requestTrend(t) # Get the trend results first to avoid memory fragmentation
+    apiResults = apiRequest.request() # A list of values from API
+    currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state = apiResults # Unpack list in this order
     
     # Add text to returned values for display
     texts = [
         latestReading,
         "Current Level: {}".format(str(currentLevel)),
         "State: {}".format(state),
-        "Trend: {}".format(apiRequestTrend.requestTrend()),
+        "Trend: {}".format(trend),
         "{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
             t[0], t[1], t[2], t[3], t[4], t[5]
             )
@@ -87,17 +91,14 @@ while True:
             wri.set_textpos(dummy, x, y)
             wri.printstring(text, invert=True)
     
-    # Display vanity
-    epd.text("Written by Kevin Roberts", 50, 180, c=epd.lightgray)
-    
     epd.blit(dummy, 0, 0, key=1, ram=epd.RAM_RED) # grayscale can be used
     epd.show()
 
     # Wait a minute
     epd.sleep() # Put ePaper to sleep
-    time.sleep(60) # API updates every 15 minutes 60*15 = 900
+    time.sleep(3600) # API updates every 15 minutes 60*15 = 900
     print("refreshing now")
     
     # Reinitialise and clear display - otherwise new text will displayed on top
     epd.reinit()
-    epd.fill() # Clear display    
+    epd.fill() # Clear display
