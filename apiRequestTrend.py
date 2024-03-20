@@ -2,6 +2,7 @@ from date import Date
 import urequests # handles making and servicing network requests
 import array
 import gc
+#import time # for testing only!
 
 r = "96" # Reading every 15 mins (4*24=96) or last 24 hours
 
@@ -25,10 +26,10 @@ def requestTrend(date):
         print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
         if status_code != 200:
             print("Error: Status code", status_code)
-            return
+            return("Error: Status code", status_code)
     except Exception as e:
         print(f"Error accessing API: {e}")
-        return
+        return(f"Error accessing API: {e}")
     finally:
         resp_json = resp.json()
         resp.close() # Essential for memory reclamation
@@ -66,5 +67,5 @@ def requestTrend(date):
     print("API trend values returned")
     return trend()
     
-#print(requestTrend())
+#print(requestTrend(time.localtime()))
 #print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))

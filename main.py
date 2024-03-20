@@ -15,11 +15,11 @@ import gc # For garbage collection!
 
 # Constants for text positions
 TEXT_POSITIONS = [
-    (10, 60),  # latestReading
-    (40, 60),  # currentLevel
-    (70, 100),  # state
-    (100, 80),   # trend
-    (140, 60)   # time
+    (10, 30),	# latestReading and time
+    (60, 30),	# currentLevel
+    (60, 270),	# normalRange
+    (90, 30),	# state
+    (90, 270)	# trend
 ]
 
 # Initialize the e-paper display
@@ -74,17 +74,16 @@ while True:
     # Get API values
     trend = apiRequestTrend.requestTrend(t) # Get the trend results first to avoid memory fragmentation
     apiResults = apiRequest.request() # A list of values from API
-    currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state = apiResults # Unpack list in this order
+    currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state,rangePercentage = apiResults # Unpack list in this order
     
     # Add text to returned values for display
     texts = [
-        latestReading,
-        "Current Level: {}".format(str(currentLevel)),
-        "State: {}".format(state),
+        "{}          {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(latestReading,
+            t[0], t[1], t[2], t[3], t[4], t[5]),
+        "Current Level: {:.2f}".format(currentLevel),
+        "Normal Range: {:.1f}-{:.1f}".format(typicalRangeLow, typicalRangeHigh),
         "Trend: {}".format(trend),
-        "{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
-            t[0], t[1], t[2], t[3], t[4], t[5]
-            )
+        "State: {} {:d}%".format(state, int(round(rangePercentage,0)))
         ]
 
     for text, (x, y) in zip(texts, TEXT_POSITIONS):

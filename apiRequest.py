@@ -17,34 +17,23 @@ def request():
         if status_code != 200:
             print("Error: Status code", status_code)
             return
-        resp_dict = resp.json()
     except Exception as e:
         print(f"Error accessing API: {e}")
         return
     finally:
+        resp_json = resp.json()
         resp.close() # Essential for memory reclamation
         del resp, status_code
         gc.collect()  # Ensure proper garbage collection
     
-    # Parse each element of json into it's own dictionary
-    items_dict = resp_dict.get("items")
-    del resp_dict
-    
-    measures_list = items_dict.get("measures") # measures is a list
-    
-    stageScale_dict = items_dict.get("stageScale")
-    del items_dict
-    #paramFlow_dict = measures_list[0] # "parameter": "flow" is first in measures array
-    paramLevel_dict = measures_list[1] # "parameter": "level" is second in measures array
-    latestReading_dict = paramLevel_dict.get("latestReading")
-
-    del measures_list, paramLevel_dict
-    
-    # Assign key values to variables
-    currentLevel = latestReading_dict.get("value")
-    latestReading = latestReading_dict.get("dateTime")
-    typicalRangeHigh = stageScale_dict.get("typicalRangeHigh")
-    typicalRangeLow = stageScale_dict.get("typicalRangeLow")
+    # Parse each element of json into it's own dictionary and assign key values to variables
+    #latestFlow = resp_json["items"]["measures"][0]["latestReading"]["value"] # measures is a list, "parameter": "flow" is first in measures array
+    latestReading = resp_json["items"]["measures"][1]["latestReading"]["dateTime"] # measures is a list, "parameter": "level" is second in measures array
+    currentLevel = resp_json["items"]["measures"][1]["latestReading"]["value"] # measures is a list, "parameter": "level" is second in measures array
+    typicalRangeHigh = resp_json["items"]["stageScale"]["typicalRangeHigh"]
+    typicalRangeLow = resp_json["items"]["stageScale"]["typicalRangeLow"]
+    rangePercentage = ((currentLevel - typicalRangeLow) * 100) / (typicalRangeHigh - typicalRangeLow)
+        
     # Tidy up returned values as strings for display
     latestReading = str(latestReading) # Clean up date as a string
     latestReading = latestReading.replace("T", " ") # Remove chars as can't convert ISO datetime to string
@@ -62,7 +51,8 @@ def request():
             return "Normal"
     
     print("API values returned")
+    
     # Return all values as a list
-    return [currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state(currentLevel)]
+    return [currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state(currentLevel),rangePercentage]
 
-#print(request())
+print(request())
