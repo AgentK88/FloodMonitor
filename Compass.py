@@ -19,4 +19,4 @@ def compassPoint(Code):
 
     return points.get(Code)
 
-print(compassPoint('NW'))
+#print(compassPoint('NW'))

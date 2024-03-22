@@ -1,13 +1,13 @@
 import urequests # handles making and servicing network requests
 import WeatherType
-import Compass
+#import Compass
 import gc
 
 url = 'http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/324224?res=daily&key=c9785cd8-dcb0-4cb5-aaf2-adf777389db7' # Telford
 
-def METrequest():
+def metRequest(period):
     
-    print("GETing API data")
+    print("GETing Weather API data")
     
     # GET API and convert json into dictionary
     try:
@@ -26,7 +26,7 @@ def METrequest():
         gc.collect()  # Ensure proper garbage collection
     
     # Parse each element of json into it's own dictionary
-    DV = resp_json["SiteRep"]["DV"]["Location"]["Period"][0]["Rep"][0]
+    DV = resp_json["SiteRep"]["DV"]["Location"]["Period"][period]["Rep"][0] # ["Period"][1] is tomorrow's weather etc
     
     del resp_json
     
@@ -36,11 +36,13 @@ def METrequest():
     WS = DV["S"] # Wind Speed
     W = DV["W"] # Weather Type
     PPd = DV["PPd"] # Precipitation Probability Day
-    Hours = DV["$"] # The number of minutes after midnight UTC
+    #Hours = DV["$"] # The number of minutes after midnight UTC
     
     WT = WeatherType.weatherType(W)
-    WDC = Compass.compassPoint(WD)
+    #WDC = Compass.compassPoint(WD)
     
-    return DV, WT, WDC
+    print("Weather API values returned")
     
-print(METrequest())
+    return Dm, FDm, WD, WS, PPd, WT
+    
+#print(metRequest(1)) # Tomorrow's weather

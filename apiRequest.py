@@ -16,10 +16,10 @@ def request():
         status_code = resp.status_code
         if status_code != 200:
             print("Error: Status code", status_code)
-            return
+            return("Error: Status code", status_code)
     except Exception as e:
         print(f"Error accessing API: {e}")
-        return
+        return(f"Error accessing API: {e}")
     finally:
         resp_json = resp.json()
         resp.close() # Essential for memory reclamation
@@ -39,6 +39,7 @@ def request():
     latestReading = latestReading.replace("T", " ") # Remove chars as can't convert ISO datetime to string
     latestReading = latestReading.replace("Z", " ") # Remove chars as can't convert ISO datetime to string
     
+    del resp_json
     gc.collect()
     
     # Find State (High, Normal, Low)
@@ -55,4 +56,4 @@ def request():
     # Return all values as a list
     return [currentLevel,latestReading,typicalRangeHigh,typicalRangeLow,state(currentLevel),rangePercentage]
 
-print(request())
+#print(request())

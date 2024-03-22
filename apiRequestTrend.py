@@ -18,19 +18,32 @@ def requestTrend(date):
     url = "https://environment.data.gov.uk/flood-monitoring/id/stations/2134/readings?parameter=level&startdate={}&enddate={}&_sorted&_limit={}".format(startDate,endDate,r)
 
     print("GETing API trend data")
-    
-    # GET API and convert json into dictionary
-    try:
-        resp = urequests.get(url)
-        status_code = resp.status_code
-        print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
+    '''
+    def get_trend_data():
+        status_code = urequests.get(url).status_code
+        
         if status_code != 200:
             print("Error: Status code", status_code)
-            return("Error: Status code", status_code)
+        else:
+            return urequests.get(url).json()#["items"] # I thought this line would be more efficient
+        
+        resp.close() # Essential for memory reclamation
+    '''
+    # GET API and convert json into dictionary
+    try:
+        #print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
+        resp = urequests.get(url)
+        status_code = resp.status_code
+        #print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
+        if status_code != 200:
+            print("Error: Status code", status_code)
+            return
     except Exception as e:
         print(f"Error accessing API: {e}")
-        return(f"Error accessing API: {e}")
+        return
     finally:
+        #print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
+        #value_list = [items['value'] for items in resp.json()["items"] ] # I thought this line would be more efficient
         resp_json = resp.json()
         resp.close() # Essential for memory reclamation
         del resp, status_code
@@ -38,7 +51,9 @@ def requestTrend(date):
 
     # Above can be done without creating both resp and resp_json and may save ram
     # However, response code can't be checked!
-    #resp_json = urequests.get(url).json()
+    #resp_json = urequests.get(url).json()["items"]
+    #value_list = [items['value'] for items in urequests.get(url).json()["items"] ] # I thought this line would be more efficient
+    #resp_json = get_trend_data()
     
     # Check if 'items' key exists in the response
     if 'items' in resp_json:
@@ -47,8 +62,9 @@ def requestTrend(date):
         for item in resp_json['items']:
             value_list.append(item.get("value"))
     
-    del resp_json
-    
+    print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
+    #del resp_json
+
     average = sum(value_list) / len(value_list)
     latest = value_list[0] # First value in the list as it is sorted
     
