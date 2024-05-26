@@ -15,7 +15,8 @@ RC = 0 # Refresh Counter
 # Set time - Only if needed. Time defaults to 2021-01-01
 t = time.localtime()
 
-resp_json = None
+resp = None
+resp_json = []
 
 def formatDateTime():
     return "{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(t[0], t[1], t[2], t[3], t[4], t[5])
@@ -115,14 +116,16 @@ def requestMet(metResponse):
     return [Dm, FDm, WD, WS, PPd, WT]
 
 trend_url = trendUrl()
-#resp_json = call_api(trend_url)
-#print(requestTrend(resp_json))
+#print(trend_url)
+
+resp_json = call_api(trend_url)
+print(requestTrend(resp_json))
 
 #resp_json = call_api(level_url)
 #print(requestLevel(resp_json))
 
-resp_json = call_api(met_url)
-print(requestMet(resp_json))
+#resp_json = call_api(met_url)
+#print(requestMet(resp_json))
 
 #print(formatDateTime())
 #print(trendUrl())

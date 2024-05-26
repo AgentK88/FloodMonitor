@@ -4,6 +4,7 @@ import WeatherType
 import gc
 
 url = 'http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/324224?res=daily&key=c9785cd8-dcb0-4cb5-aaf2-adf777389db7' # Telford
+DV = []
 
 def metRequest(period):
     
@@ -22,13 +23,9 @@ def metRequest(period):
     finally:
         resp_json = resp.json()
         resp.close() # Essential for memory reclamation
-        del resp, status_code
-        gc.collect()  # Ensure proper garbage collection
     
     # Parse each element of json into it's own dictionary
     DV = resp_json["SiteRep"]["DV"]["Location"]["Period"][period]["Rep"][0] # ["Period"][1] is tomorrow's weather etc
-    
-    del resp_json
     
     Dm = DV["Dm"] # Day Maximum Temperature
     FDm = DV["FDm"] # Feels Like Day Maximum Temperature
@@ -43,6 +40,6 @@ def metRequest(period):
     
     print("Weather API values returned")
     
-    return Dm, FDm, WD, WS, PPd, WT
+    return [Dm, FDm, WD, WS, PPd, WT]
     
 #print(metRequest(1)) # Tomorrow's weather

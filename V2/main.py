@@ -19,7 +19,8 @@ r = "96" # Reading every 15 mins (4*24=96) or last 24 hours
 level_url = "https://environment.data.gov.uk/flood-monitoring/id/stations/2134" # Buildwas station
 met_url = "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/324224?res=daily&key=c9785cd8-dcb0-4cb5-aaf2-adf777389db7" # Telford
 
-resp_json = []
+resp = None # This is a type of <class 'Response'>
+resp_json = [] # Reusable variable to store API response
 
 RC = 0 # Refresh Counter
 
@@ -97,13 +98,13 @@ def trendUrl():
     startDate = "{}-{:02d}-{:02d}".format(startDate.year, startDate.month, startDate.mday)
 
     # Buildwas station last 24 hours
-    url = "https://environment.data.gov.uk/flood-monitoring/id/stations/2134/readings?parameter=level&startdate={}&enddate={}&_sorted&_limit={}".format(startDate,endDate,r)
+    url = "https://environment.data.gov.uk/flood-monitoring/id/stations/2134/readings?parameter=level&startdate={}&enddate={}&_sorted&_limit={}".format(startDate, endDate, r)
     return url
 
-def requestTrend(trendResponse):
+def requestTrend():
     value_list = array('d',[]) # Array is more memory efficient and only holds decimal 'd'
     # Iterate over the items and extract value key pairs
-    for item in trendResponse['items']:
+    for item in resp_json['items']:
         value_list.append(item.get("value"))
 
     average = sum(value_list) / len(value_list)
@@ -120,13 +121,13 @@ def requestTrend(trendResponse):
     
     return trend()
 
-def requestLevel(levelResponse): 
+def requestLevel(): 
     # Parse each element of json into its own dictionary and assign key values to variables
     #latestFlow = resp_json["items"]["measures"][0]["latestReading"]["value"] # measures is a list, "parameter": "flow" is first in measures array
-    latestReading = levelResponse["items"]["measures"][1]["latestReading"]["dateTime"] # measures is a list, "parameter": "level" is second in measures array
-    currentLevel = levelResponse["items"]["measures"][1]["latestReading"]["value"] # measures is a list, "parameter": "level" is second in measures array
-    typicalRangeHigh = levelResponse["items"]["stageScale"]["typicalRangeHigh"]
-    typicalRangeLow = levelResponse["items"]["stageScale"]["typicalRangeLow"]
+    latestReading = resp_json["items"]["measures"][1]["latestReading"]["dateTime"] # measures is a list, "parameter": "level" is second in measures array
+    currentLevel = resp_json["items"]["measures"][1]["latestReading"]["value"] # measures is a list, "parameter": "level" is second in measures array
+    typicalRangeHigh = resp_json["items"]["stageScale"]["typicalRangeHigh"]
+    typicalRangeLow = resp_json["items"]["stageScale"]["typicalRangeLow"]
     rangePercentage = ((currentLevel - typicalRangeLow) * 100) / (typicalRangeHigh - typicalRangeLow)
         
     # Tidy up returned values as strings for display
@@ -153,7 +154,7 @@ def after6(t):
     else:
         return 1
 
-def requestMet(metResponse):
+def requestMet():
     period = after6(t)
     # Parse each element of json into it's own dictionary
     DV = resp_json["SiteRep"]["DV"]["Location"]["Period"][period]["Rep"][0] # ["Period"][1] is tomorrow's weather etc
@@ -171,19 +172,16 @@ def requestMet(metResponse):
     
     return [Dm, FDm, WD, WS, PPd, WT]
 
-trend_url = trendUrl()
-
 tc = "{}, {}".format(ip, formatDateTime())
 epd.text(tc, 20, 270, c=epd.lightgray)
 epd.show()
-
-gc.collect() # Initial run fails without this
 
 '''
 Here's the start of the loop!
 '''
 while True:
     
+    gc.collect()
     print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
     
     RC += 1 # Increment Refresh Counter
@@ -192,19 +190,20 @@ while True:
 
     # Get API trend values
     try:
+        trend_url = trendUrl()
         resp_json = call_api(trend_url)
-        trend = requestTrend(resp_json) # Get the trend results first to avoid memory fragmentation
+        trend = requestTrend() # Get the trend results first to avoid memory fragmentation
     except MemoryError as e:
         print(e)
         trend = "\n {}".format(e)
     
     # Get API level values
     resp_json = call_api(level_url)
-    currentLevel, latestReading, typicalRangeHigh, typicalRangeLow, state, rangePercentage = requestLevel(resp_json) # Unpack list in this order
+    currentLevel, latestReading, typicalRangeHigh, typicalRangeLow, state, rangePercentage = requestLevel() # Unpack list in this order
     
     # Get API Met values
     resp_json = call_api(met_url)
-    dayMaximum, feelsDayMaximum, windDirection, windSpeed, precipProb, weatherType = requestMet(resp_json) # Unpack list in this order
+    dayMaximum, feelsDayMaximum, windDirection, windSpeed, precipProb, weatherType = requestMet() # Unpack list in this order
     
     # Add text to returned values for display
     texts = [

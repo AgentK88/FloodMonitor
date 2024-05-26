@@ -6,7 +6,7 @@ import freesans20
 from webConnect import connect # handles connecting to WiFi
 from apiRequest import request # Calls Flood Level API
 from apiRequestTrend import requestTrend # Calls Flood Level API trend
-from METRequest import metRequest # Calls Met Office Weather API
+from metRequest import metRequest # Calls Met Office Weather API
 
 import time
 import ntptime # Acquire current time
@@ -15,7 +15,7 @@ import ntptime # Acquire current time
 import gc # For garbage collection!
 
 # Constants for text positions
-_TEXT_POSITIONS = [
+TEXT_POSITIONS = [
     (10, 20),	# latestReading and time
     (60, 20),	# currentLevel
     (60, 270),	# normalRange
@@ -26,6 +26,11 @@ _TEXT_POSITIONS = [
     (180, 20),	# temp
     (180, 270),	# windSpeed
 ]
+
+# Global variables for re-use
+global url
+global resp
+global resp_json
 
 # Initialize the e-paper display
 epd = EinkPIO(rotation=90, use_partial_buffer=True)
@@ -84,13 +89,13 @@ while True:
         trend = requestTrend(t) # Get the trend results first to avoid memory fragmentation
     except MemoryError as e:
         print(e)
-        #trend = "\n {}".format(e)
-        machine.reset()
+        trend = "\n {}".format(e)
+        #machine.reset()
     
     # Get API values
     apiResults = request() # A list of values from API
     currentLevel, latestReading, typicalRangeHigh, typicalRangeLow, state, rangePercentage = apiResults # Unpack list in this order
-    del apiResults
+    #del apiResults
     
     # If after 18:00 get tomorrow's weather not today's
     if t[3] <= 18:
@@ -102,7 +107,7 @@ while True:
     del metResults
     
     # Add text to returned values for display
-    _texts = [
+    texts = [
         "{}            {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(latestReading,
             t[0], t[1], t[2], t[3], t[4], t[5]),
         "Current Level: {:.2f}".format(currentLevel),
@@ -115,7 +120,7 @@ while True:
         "Wind Speed: {} mph".format(windSpeed)
         ]
 
-    for text, (x, y) in zip(_texts, _TEXT_POSITIONS):
+    for text, (x, y) in zip(texts, TEXT_POSITIONS):
             wri.set_textpos(dummy, x, y)
             wri.printstring(text, invert=True)
     
@@ -128,7 +133,7 @@ while True:
 
     # Wait a minute
     epd.sleep() # Put ePaper to sleep
-    time.sleep(600) # API updates every 15 minutes 60*15 = 900
+    time.sleep(60) # API updates every 15 minutes 60*15 = 900
     
     #machine.reset() # You're cheating!!!
     print("refreshing now {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(t[0], t[1], t[2], t[3], t[4], t[5]))
