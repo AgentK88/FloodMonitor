@@ -6,7 +6,7 @@ import freesans20
 from webConnect import connect # handles connecting to WiFi
 from apiRequest import request # Calls Flood Level API
 from apiRequestTrend import requestTrend # Calls Flood Level API trend
-from metRequest import metRequest # Calls Met Office Weather API
+from METRequest import metRequest # Calls Met Office Weather API
 
 import time
 import ntptime # Acquire current time
@@ -54,7 +54,6 @@ wri.set_clip(row_clip=True, col_clip=True, wrap=True)
 # Connect to internet
 try:
     ip = connect()
-    ip = "IP Address: {}".format(ip[0])
 except KeyboardInterrupt:
     machine.reset()
 
@@ -68,7 +67,7 @@ if tc[0] == 2021: # Check if the year is 2021
     finally:
         tc = time.localtime()
 
-tc = "{}, {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(ip,
+tc = "IP Address: {}, {}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(ip[0],
             tc[0], tc[1], tc[2], tc[3], tc[4], tc[5]
             )
 epd.text(tc, 20, 270, c=epd.lightgray)

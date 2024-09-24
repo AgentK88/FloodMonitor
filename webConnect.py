@@ -13,4 +13,4 @@ def connect():
     while wlan.isconnected() == False:
         print('Waiting for connection...')
         sleep(1)
-    print(wlan.ifconfig())
+    return(wlan.ifconfig())

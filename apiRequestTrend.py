@@ -2,7 +2,7 @@ from date import Date
 import urequests # handles making and servicing network requests
 from array import array
 import gc
-import time # for testing only!
+#import time # for testing only!
 
 r = "96" # Reading every 15 mins (4*24=96) or last 24 hours
 
@@ -57,6 +57,7 @@ def requestTrend(date):
         for item in resp_json['items']:
             value_list.append(item.get("value"))
 
+    del resp_json
     print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
 
     average = sum(value_list) / len(value_list)
@@ -75,5 +76,5 @@ def requestTrend(date):
     gc.collect()
     return trend()
     
-print(requestTrend(time.localtime()))
+#print(requestTrend(time.localtime()))
 #print('Initial free: {} allocated: {}'.format(gc.mem_free(), gc.mem_alloc()))
