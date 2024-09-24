@@ -5,7 +5,7 @@ Flood status at my local monitoring station and weather status display with Lego
 For this project I am using a [Raspberry Pi Pico W](https://thepihut.com/products/raspberry-pi-pico-w) and a 
 [3.7" e-Paper e-Ink Display for Raspberry Pi Pico](https://thepihut.com/products/3-7-e-paper-e-ink-display-for-raspberry-pi-pico-480x280)
 
-I chose these products as I intend to have an always on display with exceptionally low power consumption. River levels tend to change slowly and so there is little need to update the display more refularly than hourly.
+I chose these products as I intend to have an always on display with exceptionally low power consumption. River levels tend to change slowly and so there is little need to update the display more regularly than hourly.
 
 Original inspiration
   - https://ukdepartureboards.co.uk/store/product/desktop-departures
