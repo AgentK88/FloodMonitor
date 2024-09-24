@@ -7,7 +7,7 @@ For this project I am using a [Raspberry Pi Pico W](https://thepihut.com/product
 
 I chose these products as I intend to have an always on display with exceptionally low power consumption. River levels tend to change slowly and so there is little need to update the display more regularly than hourly.
 
-Original inspiration
+### Original inspiration
   - https://ukdepartureboards.co.uk/store/product/desktop-departures
   - https://github.com/chrisys/train-departure-display
 
@@ -26,9 +26,10 @@ Credit for the Lego design in the pictures below must be attributed to my dear o
 
 [What does river level mean?](https://check-for-flooding.service.gov.uk/how-we-measure-river-sea-groundwater-levels)
 
-### Weather
+### Weather API
 
 [Met Office DataPoint API](https://www.metoffice.gov.uk/services/data/datapoint/getting-started)
+
 
 #### *Credit where it's due!*
 
