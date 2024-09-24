@@ -39,3 +39,7 @@ writer and freesans20 from [MicroPython nano-gui](https://github.com/peterhinch/
 and eventually to other useful things such as...
 
 date and ntptime from [micropython-samples](https://github.com/peterhinch/micropython-samples)
+
+Later into the project, I realised that there was a need to freeze modules. However, there seems to be very little advice online on how to do this.
+
+[This post on Reddit made the process of freezing modules on Raspberry Pico W simple!](https://www.reddit.com/r/raspberrypipico/comments/1endjfd/quick_tutorialinstructions_on_how_to_freeze/)
