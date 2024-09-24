@@ -3,8 +3,8 @@
 Flood status at local station and weather status display with Lego stand
 
 Original inspiration
-  - https://ukdepartureboards.co.uk/store/product/desktop-departures/?desktop=true
-  - https://github.com/chrisys/train-departure-display/tree/main
+  - https://ukdepartureboards.co.uk/store/product/desktop-departures
+  - https://github.com/chrisys/train-departure-display
 
 Credit for the Lego design in the pictures below must be attributed to my dear old friend Gregory Bullock. Not only is he a Lego aficionado but also a softwaare engineer par excellence!!! Much love my brother xx
 
