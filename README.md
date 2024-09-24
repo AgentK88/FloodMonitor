@@ -28,8 +28,7 @@ Credit for the Lego design in the pictures below must be attributed to my dear o
 
 ### Weather API
 
-[Met Office DataPoint API](https://www.metoffice.gov.uk/services/data/datapoint/getting-started)
-
+[Met Office DataPoint API](https://www.metoffice.gov.uk/services/data/datapoint/getting-started)  
 
 #### *Credit where it's due!*
 
