@@ -32,10 +32,10 @@ Credit for the Lego design in the pictures below must be attributed to my dear o
 
 #### *Credit where it's due!*
 
-In addition to those listed above, I've had to find and use multiple other repositories to complete this project. Below I list the repositories that have either been an inspiration or used in the final solution
+In addition to those listed above, I've had to find and use other repositories to complete this project. Below I list the repositories that have either been an inspiration or used in the final solution
 
 [raspi-pico-epaper](https://github.com/CoenTempelaars/raspi-pico-epaper)
-Original display driver used for testing Waveshare 3.7 Inch E-paper
+Original display driver used for testing Waveshare 3.7 Inch E-paper, based on [Pico_ePaper_Code](https://github.com/waveshareteam/Pico_ePaper_Code/blob/main/python/Pico-ePaper-3.7.py)
 
 [Pico_ePaper](https://github.com/phoreglad/pico-epaper)
 Updated display driver used in final solution, which also led me to...
@@ -45,6 +45,6 @@ and eventually to other useful things such as...
 
 date and ntptime from [micropython-samples](https://github.com/peterhinch/micropython-samples)
 
-Later into the project, I realised that there was a need to freeze modules. However, there seems to be very little advice online on how to do this.
+Later into the project, I realised that there was a need to freeze modules to save on RAM usage and to improve display time. However, there seems to be very little advice online on how to do this.
 
 [This post on Reddit made the process of freezing modules on Raspberry Pico W simple!](https://www.reddit.com/r/raspberrypipico/comments/1endjfd/quick_tutorialinstructions_on_how_to_freeze/)
